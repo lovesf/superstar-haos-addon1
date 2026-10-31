@@ -1,0 +1,52 @@
+---
+name: SuperStar 学习通刷课
+version: "1.0.0"
+slug: superstar
+description: >-
+  学习通 / 超星 云端刷课脚本（lispringing/SuperStar）的 Home Assistant 加载项。
+  支持「扫码登录」（cookie 模式），无需写明账号密码。
+  配置、启停、日志都在 Home Assistant 界面内完成。
+url: https://github.com/lispringing/SuperStar
+
+arch:
+  - amd64
+  - aarch64
+
+# 走 alpine + CMD 方式（Supervisor 2026.04 起不再注入 BUILD_FROM，不能依赖 hassio base）
+init: false
+startup: application
+boot: auto
+
+# 需要读写 /share（可放 cookies.txt 备份），写法与其它本地加载项保持一致
+map:
+  - share:rw
+
+options:
+  use_cookies: false
+  cookies: ""
+  username: ""
+  password: ""
+  course_list: ""
+  speed: 1.0
+  jobs: 4
+  notopen_action: retry
+  auto_sign: false
+  tiku_provider: TikuYanxi
+  tiku_tokens: ""
+  notification_provider: ServerChan
+  notification_url: ""
+
+schema:
+  use_cookies: bool
+  cookies: str?
+  username: str?
+  password: str?
+  course_list: str?
+  speed: float
+  jobs: int
+  notopen_action: list(retry,continue,ask)
+  auto_sign: bool
+  tiku_provider: str?
+  tiku_tokens: str?
+  notification_provider: str?
+  notification_url: str?

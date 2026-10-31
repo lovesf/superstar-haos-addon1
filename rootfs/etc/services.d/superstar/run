@@ -1,0 +1,25 @@
+#!/usr/bin/with-contenv bashio
+# SuperStar 加载项启动脚本（s6 服务）
+cd /app
+
+bashio::log.info "根据加载项配置生成 config.ini ..."
+python3 /app/gen_config.py
+
+# ---- 准备 cookies（扫码登录）----
+# 优先级：① 加载项配置里的 cookies 字段 ② /share/superstar/cookies.txt
+COOKIES=$(bashio::config 'cookies')
+if [ -n "$COOKIES" ]; then
+    bashio::log.info "使用配置中的 cookies（扫码登录模式）"
+    printf '%s' "$COOKIES" > /app/cookies.txt
+elif [ -f /share/superstar/cookies.txt ]; then
+    bashio::log.info "使用 /share/superstar/cookies.txt"
+    cp /share/superstar/cookies.txt /app/cookies.txt
+else
+    bashio::log.warning "未检测到 cookies；若也未填写账号密码，登录将失败。扫码登录请在配置里粘贴 cookies。"
+fi
+
+bashio::log.info "开始刷课 ..."
+python3 /app/main.py -c /app/config.ini || bashio::log.error "刷课进程异常退出，请查看上方日志"
+
+bashio::log.info "✅ 刷课任务结束。加载项保持运行以便查看日志；如需再次运行，请在加载项页面点“重启”。"
+exec sleep infinity
